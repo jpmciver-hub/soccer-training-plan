@@ -1,0 +1,9 @@
+{
+  "name": "Soccer Training Plan",
+  "short_name": "Training",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a14",
+  "theme_color": "#0a0a14",
+  "description": "U11 Pre Academy Summer Training Plan"
+}

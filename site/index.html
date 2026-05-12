@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a14">
+<title>Soccer Training Plan | U11 Pre Academy</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        brand: { 400:'#818cf8', 500:'#6366f1', 600:'#4f46e5', 700:'#4338ca' },
+        surface: { 800:'#1e1e2e', 850:'#181825', 900:'#11111b', 950:'#0a0a14' }
+      },
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;background:#0a0a14;color:#e5e7eb;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#11111b}::-webkit-scrollbar-thumb{background:#4338ca;border-radius:9999px}
+  .glass{background:rgba(30,30,46,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.05);border-radius:1rem}
+  .tab-active{background:rgba(99,102,241,.15);color:#818cf8}
+  .check-done{text-decoration:line-through;opacity:.5}
+  details summary{cursor:pointer;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details[open] summary .arrow{transform:rotate(90deg)}
+  .video-link{display:inline-flex;align-items:center;gap:4px;color:#818cf8;font-size:.75rem;font-weight:600;padding:2px 8px;background:rgba(99,102,241,.1);border-radius:6px;text-decoration:none;transition:all .2s}
+  .video-link:hover{background:rgba(99,102,241,.25)}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn .3s ease-out}
+  .solo-badge{background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+</style>
+</head>
+<body class="min-h-screen pb-20 md:pb-8">
+
+<div id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+
+const DRILLS = {
+  footwork: {
+    title: "Footwork & Touches",
+    day: "Monday",
+    duration: "60 min",
+    icon: "👟",
+    solo: true,
+    warmup: [
+      { id:"fw-w1", name:"Juggling", time:"5 min", desc:"Alternating feet. Count and beat your personal best.", video:"https://www.youtube.com/watch?v=KaktBhbJUyg", videoLabel:"Ball Mastery for Kids", solo:true },
+      { id:"fw-w2", name:"Toe Taps", time:"3 min", desc:"Ball stationary, alternate feet on top. Start slow, build to game speed.", video:"https://www.youtube.com/watch?v=KaktBhbJUyg", videoLabel:"Toe Tap Variations", solo:true },
+      { id:"fw-w3", name:"Ball Rolls", time:"2 min", desc:"Sole of foot, roll ball side to side. Both feet.", solo:true },
+    ],
+    blocks: [
+      {
+        title: "Foundation Touches",
+        time: "15 min",
+        drills: [
+          { id:"fw-1", name:"Inside-Inside", reps:"3 x 1 min", desc:"Tap ball between feet using inside of both feet. Stay on toes, knees bent.", video:"https://www.youtube.com/watch?v=tBV9Ul1a7Pw", videoLabel:"5 Essential Footwork Drills", solo:true },
+          { id:"fw-2", name:"Inside-Outside (same foot)", reps:"3 x 1 min each foot", desc:"Touch inside, then outside, same foot. Keep ball close.", solo:true },
+          { id:"fw-3", name:"Pull-Back Turn", reps:"10 each foot", desc:"Stop ball with sole, pull back, turn 180. Accelerate out.", video:"https://www.youtube.com/watch?v=tBV9Ul1a7Pw", videoLabel:"Footwork Tutorial", solo:true },
+          { id:"fw-4", name:"Cruyff Turn", reps:"10 each foot", desc:"Plant foot beside ball, chop behind standing leg with inside of foot.", video:"https://www.youtube.com/watch?v=JHeFB7B7WYQ", videoLabel:"Cruyff Turn Tutorial", solo:true },
+          { id:"fw-5", name:"Sole Roll Across Body", reps:"3 x 1 min", desc:"Roll ball across body with sole, receive with opposite foot inside.", solo:true },
+        ]
+      },
+      {
+        title: "Moving Touches (20-yard channel)",
+        time: "15 min",
+        drills: [
+          { id:"fw-6", name:"Inside-only dribble", reps:"4 lengths", desc:"Both feet alternating. Head up between touches.", solo:true },
+          { id:"fw-7", name:"Outside-only dribble", reps:"4 lengths", desc:"Push with outside of foot. Small touches, close control.", solo:true },
+          { id:"fw-8", name:"Sole roll forward", reps:"4 lengths", desc:"Roll ball forward with sole, both feet alternating.", solo:true },
+          { id:"fw-9", name:"Combo: inside-outside-sole", reps:"4 lengths", desc:"Cycle through all three surfaces on each foot.", solo:true },
+          { id:"fw-10", name:"Speed dribble", reps:"4 lengths", desc:"As fast as possible with ball under control.", solo:true },
+        ]
+      },
+      {
+        title: "Patterns & Combos (5x5 cone square)",
+        time: "10 min",
+        drills: [
+          { id:"fw-11", name:"Box touches", reps:"5 min", desc:"Dribble around square using a different surface on each side.", solo:true },
+          { id:"fw-12", name:"Figure 8", reps:"5 min", desc:"Weave figure-8 around two cones 3 yards apart. Alternate lead foot.", solo:true },
+        ]
+      }
+    ],
+    cooldown: [
+      { id:"fw-c1", name:"Juggling challenge", time:"5 min", desc:"Try to beat your morning count.", solo:true },
+      { id:"fw-c2", name:"Static stretching", time:"5 min", desc:"Quads, hamstrings, calves, hip flexors, groin.", solo:true },
+    ],
+    touchCount: "600-800 touches per session"
+  },
+
+  speed: {
+    title: "Speed & Agility",
+    day: "Tuesday",
+    duration: "45 min",
+    icon: "⚡",
+    solo: true,
+    warmup: [
+      { id:"sp-w1", name:"Light jog", time:"2 min", desc:"Easy pace, loosen up.", solo:true },
+      { id:"sp-w2", name:"High knees", time:"2 x 20 yards", desc:"Drive knees up, pump arms, stay on toes.", solo:true },
+      { id:"sp-w3", name:"Butt kicks", time:"2 x 20 yards", desc:"Heels to glutes, quick turnover.", solo:true },
+      { id:"sp-w4", name:"Carioca / grapevine", time:"2 x 20 yards each dir", desc:"Hips open, stay low.", solo:true },
+      { id:"sp-w5", name:"A-skips", time:"2 x 20 yards", desc:"Drive knee up, skip off ground, arm drive.", solo:true },
+      { id:"sp-w6", name:"Lateral shuffles", time:"2 x 20 yards each dir", desc:"Low stance, don't cross feet.", solo:true },
+    ],
+    blocks: [
+      {
+        title: "Linear Speed",
+        time: "10 min",
+        drills: [
+          { id:"sp-1", name:"10-yard burst", reps:"4 x 2 (30s rest)", desc:"Explosive first 3 steps. Forward lean, drive arms.", solo:true },
+          { id:"sp-2", name:"20-yard sprint", reps:"4 x 2 (45s rest)", desc:"Accelerate through 10 yards, maintain speed to 20.", solo:true },
+          { id:"sp-3", name:"Flying 20s", reps:"3 x 1 (60s rest)", desc:"10-yard build-up, hit max speed for 20 yards.", solo:true },
+        ]
+      },
+      {
+        title: "Change of Direction",
+        time: "10 min",
+        drills: [
+          { id:"sp-4", name:"5-10-5 Shuttle", reps:"4 (45s rest)", desc:"Sprint 5 right, touch, 10 left, touch, 5 back. Low hips on cuts.", video:"https://barcelonapremiersc.com/soccer-club/soccer-speed-and-agility-drills-for-kids/", videoLabel:"Speed & Agility Guide", solo:true },
+          { id:"sp-5", name:"T-Drill", reps:"3 (45s rest)", desc:"Sprint 10 fwd, shuffle 5 left, 10 right, 5 center, backpedal.", video:"https://www.risefcsoccer.com/youth-soccer-agility-drills/", videoLabel:"Agility Drills", solo:true },
+          { id:"sp-6", name:"Zig-zag cone sprint", reps:"4 (30s rest)", desc:"6 cones zig-zag, 3 yards apart. Plant outside foot, drive off.", solo:true },
+        ]
+      },
+      {
+        title: "Agility Ladder",
+        time: "10 min",
+        drills: [
+          { id:"sp-7", name:"2-foot in-each", reps:"3 runs", desc:"Quick feet, both feet in every box. Arms drive.", video:"https://www.risefcsoccer.com/soccer-ladder-drills/", videoLabel:"Ladder Drill Guide", solo:true },
+          { id:"sp-8", name:"Lateral 2-in", reps:"3 each dir", desc:"Face sideways, two feet in each box.", solo:true },
+          { id:"sp-9", name:"Ickey Shuffle", reps:"3 each dir", desc:"In-in-out pattern. Stay low, quick contacts.", video:"https://www.gftskills.com/agility-ladder-drills-for-soccer-all-ages/", videoLabel:"Ickey Shuffle Demo", solo:true },
+          { id:"sp-10", name:"1-foot hop", reps:"2 each foot", desc:"Single-leg hops through each box.", solo:true },
+          { id:"sp-11", name:"Ali Shuffle", reps:"3 runs", desc:"Straddle ladder, feet in-out rapidly.", solo:true },
+        ]
+      }
+    ],
+    cooldown: [
+      { id:"sp-c1", name:"Walking lap", time:"2 min", desc:"Easy walk, shake out legs.", solo:true },
+      { id:"sp-c2", name:"Static stretching", time:"3 min", desc:"Hip flexors, quads, hamstrings, calves, ankles.", solo:true },
+    ]
+  },
+
+  dribbling: {
+    title: "Dribbling & 1v1",
+    day: "Wednesday",
+    duration: "60 min",
+    icon: "🏃",
+    solo: false,
+    warmup: [
+      { id:"dr-w1", name:"Free dribble", time:"3 min", desc:"Dribble in 15x15 box. Random direction changes.", solo:true },
+      { id:"dr-w2", name:"Cone weave (close)", time:"3 min", desc:"8 cones, 2 yards apart. Weave with inside/outside.", solo:true },
+      { id:"dr-w3", name:"Cone weave (wide)", time:"2 min", desc:"Same cones, 4 yards apart. Push and accelerate.", solo:true },
+      { id:"dr-w4", name:"Fast feet on ball", time:"2 min", desc:"Toe taps, max speed 20 sec, rest 10 sec. 4 sets.", solo:true },
+    ],
+    blocks: [
+      {
+        title: "Moves to Beat a Defender",
+        time: "15 min",
+        note: "Practice each move stationary first, then approach a cone.",
+        drills: [
+          { id:"dr-1", name:"Scissors", reps:"10 each side", desc:"Step over inside to out, push away with opposite outside foot.", video:"https://www.youtube.com/watch?v=tBV9Ul1a7Pw", videoLabel:"Footwork Moves", solo:true },
+          { id:"dr-2", name:"Step-over", reps:"10 each side", desc:"Foot around ball outside to inside, push with outside same foot.", solo:true },
+          { id:"dr-3", name:"Matthews cut", reps:"10 each side", desc:"Push inside, quickly cut back with outside same foot. Change of pace is key.", solo:true },
+          { id:"dr-4", name:"Body feint", reps:"10 each side", desc:"Drop shoulder one way, push ball other way with outside.", solo:true },
+          { id:"dr-5", name:"Chop (inside cut)", reps:"10 each side", desc:"At speed, chop behind standing leg with inside, turn and go.", solo:true },
+          { id:"dr-6", name:"Drag-back and go", reps:"10 each side", desc:"Sole roll backward, push forward with laces and accelerate.", solo:true },
+        ]
+      },
+      {
+        title: "Moves at Speed (5 cones, 5 yards apart)",
+        time: "10 min",
+        drills: [
+          { id:"dr-7", name:"Scissors at every cone", reps:"2 runs", desc:"Full speed approach, execute at each cone.", solo:true },
+          { id:"dr-8", name:"Step-over at every cone", reps:"2 runs", desc:"Sell the move with body lean.", solo:true },
+          { id:"dr-9", name:"Matthews at every cone", reps:"2 runs", desc:"Change of pace: slow, then explode.", solo:true },
+          { id:"dr-10", name:"Player's choice", reps:"4 runs", desc:"Different move at each cone. Game speed.", solo:true },
+        ]
+      },
+      {
+        title: "1v1 Situations (with partner)",
+        time: "15 min",
+        drills: [
+          { id:"dr-11", name:"1v1 to line", reps:"5 min", desc:"10x15 grid. Dribble past defender to end line. Alternate roles.", solo:false },
+          { id:"dr-12", name:"1v1 to mini goals", reps:"5 min", desc:"Cone goals each end. First to 5.", solo:false },
+          { id:"dr-13", name:"Gauntlet", reps:"5 min", desc:"5-yard channel, 15 yards long. Beat the defender.", solo:false },
+        ]
+      }
+    ],
+    cooldown: [
+      { id:"dr-c1", name:"Free dribble (easy)", time:"3 min", solo:true },
+      { id:"dr-c2", name:"Juggling", time:"3 min", solo:true },
+      { id:"dr-c3", name:"Stretching", time:"4 min", desc:"Groin, hip flexors, quads, hamstrings, ankles.", solo:true },
+    ]
+  },
+
+  shooting: {
+    title: "Shooting & Finishing",
+    day: "Friday",
+    duration: "60 min",
+    icon: "🎯",
+    solo: false,
+    warmup: [
+      { id:"sh-w1", name:"Wall passes", time:"3 min", desc:"10 yards from wall. Alternate feet, inside of foot.", solo:true },
+      { id:"sh-w2", name:"Laces strikes (stationary)", time:"3 min", desc:"Strike into wall/net. Plant foot beside ball, lock ankle.", video:"https://www.youtube.com/watch?v=ibYthQWrN4g", videoLabel:"Laces Technique", solo:true },
+      { id:"sh-w3", name:"Juggling (laces + thigh)", time:"2 min", desc:"Develop feel for clean laces contact.", solo:true },
+      { id:"sh-w4", name:"Dynamic stretch", time:"2 min", desc:"Leg swings front/back, side/side, hip circles.", solo:true },
+    ],
+    blocks: [
+      {
+        title: "Striking Technique (12-15 yards)",
+        time: "15 min",
+        drills: [
+          { id:"sh-1", name:"Driven shot (laces)", reps:"10 each foot", desc:"Plant foot pointing at target. Lock ankle. Strike center of ball. Follow through.", video:"https://www.youtube.com/watch?v=Q08yheXF4OQ", videoLabel:"Power & Accuracy Guide", solo:true },
+          { id:"sh-2", name:"Placed shot (inside)", reps:"10 each foot", desc:"Open body, stroke with inside foot to corners. Accuracy over power.", solo:true },
+          { id:"sh-3", name:"Low driven (laces)", reps:"10 each foot", desc:"Lean over ball. Strike top half. Keep it on the ground.", video:"https://www.youtube.com/watch?v=cvwOsHbFaoc", videoLabel:"Shooting for Parents", solo:true },
+          { id:"sh-4", name:"Chip / lob", reps:"5 each foot", desc:"Get underneath the ball. Short backswing, stab under.", solo:true },
+        ]
+      },
+      {
+        title: "Finishing Scenarios",
+        time: "15 min",
+        drills: [
+          { id:"sh-5", name:"Cone gate targets", reps:"10 shots", desc:"4 cone gates in goal corners. 1 point per hit. Track score.", solo:true },
+          { id:"sh-6", name:"First touch and shoot", reps:"10", desc:"Receive pass from side, set and strike. Both sides.", solo:false },
+          { id:"sh-7", name:"Turn and shoot", reps:"10", desc:"Back to goal, 15 yards. Receive, turn, shoot.", solo:false },
+          { id:"sh-8", name:"Dribble and finish", reps:"8", desc:"Start 25 yards out. Dribble at speed, shoot from 15.", solo:true },
+        ]
+      },
+      {
+        title: "Game-Realistic Finishing",
+        time: "10 min",
+        drills: [
+          { id:"sh-9", name:"1v1 vs keeper/parent", reps:"6", desc:"Start 20 yards out. Beat them and finish.", solo:false },
+          { id:"sh-10", name:"One-touch finish", reps:"10", desc:"Ball rolled across box. One touch into goal.", solo:false },
+          { id:"sh-11", name:"Volley / half-volley", reps:"10", desc:"Tossed ball. Bounce once or strike from air. Lock ankle.", solo:false },
+        ]
+      }
+    ],
+    cooldown: [
+      { id:"sh-c1", name:"Free kicks from 20 yards", time:"5 min", desc:"Fun, low pressure, aim for corners.", solo:true },
+      { id:"sh-c2", name:"Stretching", time:"5 min", desc:"Quads, hip flexors, hamstrings, calves, ankles.", solo:true },
+    ]
+  },
+
+  defending: {
+    title: "Defending",
+    day: "Wed & Sat",
+    duration: "20-30 min",
+    icon: "🛡️",
+    solo: false,
+    warmup: [],
+    blocks: [
+      {
+        title: "Defensive Drills",
+        time: "25 min",
+        drills: [
+          { id:"df-1", name:"Closing Down", reps:"10 each role", desc:"Sprint to close, decelerate into side-on stance at 2-3 yards. Don't tackle yet.", video:"https://www.youtube.com/watch?v=XsHs4dW4pNY", videoLabel:"US Youth Soccer: How to Defend", solo:false },
+          { id:"df-2", name:"1v1 Defending to gate", reps:"2-min rounds", desc:"Stay between attacker and gate. Channel to one side. Wait for heavy touch.", video:"https://www.youtube.com/watch?v=ceMFekk-xdE", videoLabel:"1v1 Defending Drills", solo:false },
+          { id:"df-3", name:"Recovery Runs", reps:"6", desc:"Attacker starts ahead. Sprint to get goal-side, then defend 1v1.", solo:false },
+          { id:"df-4", name:"Block tackle", reps:"5 each foot", desc:"Step in with inside foot, firm ankle, body weight forward. Practice on rolling ball.", solo:true },
+          { id:"df-5", name:"Poke tackle", reps:"5 each foot", desc:"From jockeying position, extend far foot to poke ball away.", solo:true },
+        ]
+      }
+    ],
+    cooldown: [],
+    principles: [
+      "Close down quickly, slow down late",
+      "Side-on stance — force attacker one direction",
+      "Stay on your feet — patience wins",
+      "Watch the ball, not the body",
+      "Win it, don't just block it"
+    ]
+  },
+
+  strength: {
+    title: "Strength & Conditioning",
+    day: "Thursday",
+    duration: "30-40 min",
+    icon: "💪",
+    solo: true,
+    warmup: [
+      { id:"st-w1", name:"Jog in place", time:"1 min", solo:true },
+      { id:"st-w2", name:"Arm circles", time:"30 sec each dir", solo:true },
+      { id:"st-w3", name:"Hip circles", time:"30 sec each dir", solo:true },
+      { id:"st-w4", name:"Bodyweight squats", reps:"10", desc:"Slow and controlled.", solo:true },
+      { id:"st-w5", name:"Walking lunges", reps:"10 each leg", solo:true },
+    ],
+    blocks: [
+      {
+        title: "Lower Body",
+        time: "10 min",
+        drills: [
+          { id:"st-1", name:"Bodyweight squats", reps:"3 x 12", desc:"Feet shoulder-width, weight in heels, chest up. Full depth.", solo:true },
+          { id:"st-2", name:"Split squats", reps:"3 x 8 each leg", desc:"Rear foot elevated if possible. Front knee tracks over toes.", solo:true },
+          { id:"st-3", name:"Lateral lunges", reps:"2 x 8 each side", desc:"Step wide, sit hips back. Great for groin strength.", solo:true },
+          { id:"st-4", name:"Single-leg RDL", reps:"2 x 8 each leg", desc:"Stand on one leg, hinge at hips. Develops hamstrings and balance.", solo:true },
+          { id:"st-5", name:"Calf raises", reps:"2 x 15", desc:"Edge of step if available. Full range.", solo:true },
+        ]
+      },
+      {
+        title: "Core",
+        time: "10 min",
+        drills: [
+          { id:"st-6", name:"Plank", reps:"3 x 30 sec", desc:"Elbows under shoulders, body straight. No sagging hips.", solo:true },
+          { id:"st-7", name:"Side plank", reps:"2 x 20 sec each", desc:"Hips up, straight line head to feet.", solo:true },
+          { id:"st-8", name:"Dead bugs", reps:"3 x 8 each side", desc:"On back, extend opposite arm and leg. Lower back pressed to ground.", solo:true },
+          { id:"st-9", name:"Bicycle crunches", reps:"2 x 12 each side", desc:"Slow and controlled. Don't pull on neck.", solo:true },
+          { id:"st-10", name:"Superman hold", reps:"3 x 15 sec", desc:"Face down, lift arms and legs. Squeeze glutes.", solo:true },
+        ]
+      },
+      {
+        title: "Balance & Bands",
+        time: "10 min",
+        drills: [
+          { id:"st-11", name:"Single-leg balance", reps:"2 x 30 sec each", desc:"Eyes closed for progression.", solo:true },
+          { id:"st-12", name:"Band lateral walks", reps:"2 x 10 each dir", desc:"Band around ankles. Stay low, step sideways.", solo:true },
+          { id:"st-13", name:"Band monster walks", reps:"2 x 10 fwd + back", desc:"Wide stance, walk forward/back. Keep tension.", solo:true },
+          { id:"st-14", name:"Band pull-aparts", reps:"2 x 12", desc:"Band at chest, pull to sides. Shoulder health.", solo:true },
+          { id:"st-15", name:"Single-leg hop & stick", reps:"2 x 5 each", desc:"Hop forward, land and hold 3 sec.", solo:true },
+        ]
+      }
+    ],
+    cooldown: [
+      { id:"st-c1", name:"Child's pose", time:"30 sec", solo:true },
+      { id:"st-c2", name:"Cat-cow", time:"30 sec", solo:true },
+      { id:"st-c3", name:"Quad stretch", time:"30 sec each", solo:true },
+      { id:"st-c4", name:"Hamstring stretch", time:"30 sec each", solo:true },
+      { id:"st-c5", name:"Hip flexor stretch", time:"30 sec each", solo:true },
+      { id:"st-c6", name:"Pigeon stretch", time:"30 sec each", solo:true },
+    ]
+  }
+};
+
+const SOLO_SESSIONS = [
+  {
+    id: "solo-quick",
+    title: "Quick Touch Session",
+    time: "20 min",
+    desc: "A fast session you can do alone with just a ball and a small space.",
+    drills: [
+      { id:"sq-1", name:"Toe Taps", time:"2 min", desc:"Alternate feet on top of ball. Build speed.", video:"https://www.youtube.com/watch?v=KaktBhbJUyg", videoLabel:"Toe Tap Variations" },
+      { id:"sq-2", name:"Inside-Inside", time:"2 min", desc:"Tap ball between feet with insides. Stay on toes." },
+      { id:"sq-3", name:"Sole Rolls", time:"2 min", desc:"Roll ball side to side with sole. Both feet." },
+      { id:"sq-4", name:"Pull-Back Turns", time:"3 min", desc:"10 each foot. Stop with sole, pull back, turn, go." },
+      { id:"sq-5", name:"Juggling Challenge", time:"5 min", desc:"Try to beat your personal best! Count every touch.", video:"https://www.risefcsoccer.com/youth-soccer-juggling-drills/", videoLabel:"Juggling Guide" },
+      { id:"sq-6", name:"Figure 8 Dribble", time:"3 min", desc:"Two cones 3 yards apart. Weave figure-8. Alternate lead foot." },
+      { id:"sq-7", name:"Speed Dribble", time:"3 min", desc:"20 yards: dribble as fast as possible. Walk back. Repeat." },
+    ]
+  },
+  {
+    id: "solo-moves",
+    title: "Moves Practice",
+    time: "25 min",
+    desc: "Practice your 1v1 moves using cones as defenders.",
+    drills: [
+      { id:"sm-1", name:"Cone Weave Warm-Up", time:"3 min", desc:"8 cones, 2 yards apart. Weave in and out." },
+      { id:"sm-2", name:"Scissors at Cone", time:"3 min", desc:"Approach cone, do a scissors, explode past.", video:"https://www.youtube.com/watch?v=tBV9Ul1a7Pw", videoLabel:"Essential Moves" },
+      { id:"sm-3", name:"Step-Over at Cone", time:"3 min", desc:"Same setup. Sell it with your body!" },
+      { id:"sm-4", name:"Matthews Cut", time:"3 min", desc:"Push inside, cut back outside. Change of pace!" },
+      { id:"sm-5", name:"Cruyff Turn at Cone", time:"3 min", desc:"Approach, chop behind standing leg, go the other way.", video:"https://www.youtube.com/watch?v=JHeFB7B7WYQ", videoLabel:"Cruyff Turn Tutorial" },
+      { id:"sm-6", name:"Combo Runs", time:"5 min", desc:"5 cones in a line. Different move at each one." },
+      { id:"sm-7", name:"Free Choice Speed Runs", time:"5 min", desc:"Full speed. Pick your best moves. Be creative!" },
+    ]
+  },
+  {
+    id: "solo-fitness",
+    title: "Solo Fitness & Core",
+    time: "20 min",
+    desc: "No ball needed. Build strength and speed on your own.",
+    drills: [
+      { id:"sf-1", name:"High Knees", time:"2 x 30 sec", desc:"Drive knees up, pump arms. 15 sec rest between." },
+      { id:"sf-2", name:"Bodyweight Squats", reps:"3 x 10", desc:"Feet shoulder-width. Go all the way down." },
+      { id:"sf-3", name:"Lunges", reps:"2 x 8 each leg", desc:"Big step forward, back knee almost touches ground." },
+      { id:"sf-4", name:"Plank", reps:"3 x 30 sec", desc:"Elbows under shoulders. Keep body straight like a board." },
+      { id:"sf-5", name:"Side Plank", reps:"2 x 20 sec each", desc:"Stack feet, hips up. Straight line!" },
+      { id:"sf-6", name:"Dead Bugs", reps:"2 x 8 each side", desc:"On your back. Opposite arm and leg extend. Keep back flat." },
+      { id:"sf-7", name:"Single-Leg Balance", reps:"2 x 30 sec each", desc:"Stand on one foot. Try closing your eyes!" },
+      { id:"sf-8", name:"10-Yard Sprints", reps:"6 sprints", desc:"Walk back between each one. Explode off the line!" },
+    ]
+  },
+  {
+    id: "solo-shooting",
+    title: "Wall & Target Shooting",
+    time: "25 min",
+    desc: "Practice shooting against a wall or into a net by yourself.",
+    drills: [
+      { id:"ss-1", name:"Wall Passes (inside foot)", time:"3 min", desc:"10 yards from wall. Alternate feet. Clean contact.", video:"https://www.youtube.com/watch?v=ibYthQWrN4g", videoLabel:"Shooting Technique" },
+      { id:"ss-2", name:"Laces Strikes", time:"5 min", desc:"Ball on ground. Strike with laces into wall. Lock ankle, hit center of ball.", video:"https://www.youtube.com/watch?v=Q08yheXF4OQ", videoLabel:"Laces Power Guide" },
+      { id:"ss-3", name:"Placed Shots (inside foot)", time:"5 min", desc:"Pick a target on the wall. Stroke with inside foot. Accuracy!" },
+      { id:"ss-4", name:"Low Driven", time:"5 min", desc:"Lean over ball. Strike top half. Keep it on the ground." },
+      { id:"ss-5", name:"Dribble and Strike", time:"5 min", desc:"Start 20 yards out. Dribble to 12 yards, shoot. Walk back." },
+      { id:"ss-6", name:"Weak Foot Only", time:"5 min", desc:"All the same drills but ONLY with your weak foot. It feels weird but keep going!" },
+    ]
+  },
+];
+
+const WEEKLY_SCHEDULE = [
+  { day:"Monday", session:"Footwork & Touches", icon:"👟", key:"footwork", solo:true },
+  { day:"Tuesday", session:"Speed & Agility", icon:"⚡", key:"speed", solo:true },
+  { day:"Wednesday", session:"Dribbling & 1v1", icon:"🏃", key:"dribbling", solo:false },
+  { day:"Thursday", session:"Strength & Conditioning", icon:"💪", key:"strength", solo:true },
+  { day:"Friday", session:"Shooting & Finishing", icon:"🎯", key:"shooting", solo:false },
+  { day:"Saturday", session:"Game / Clinic / WakeFC", icon:"⚽", key:null, solo:false },
+  { day:"Sunday", session:"Rest & Recovery", icon:"😴", key:null, solo:false },
+];
+
+// ═══════════════════════════════════════════
+// STATE & PERSISTENCE
+// ═══════════════════════════════════════════
+
+function loadChecks() {
+  try { return JSON.parse(localStorage.getItem('stp_checks') || '{}'); } catch { return {}; }
+}
+function saveChecks(c) { localStorage.setItem('stp_checks', JSON.stringify(c)); }
+function getDateKey() { return new Date().toISOString().split('T')[0]; }
+
+let checks = loadChecks();
+let currentTab = 'schedule';
+let currentDrill = null;
+let soloMode = false;
+
+// ═══════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════
+
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k,v]) => {
+    if (k === 'className') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'innerHTML') el.innerHTML = v;
+    else el.setAttribute(k, v);
+  });
+  children.flat().forEach(c => {
+    if (c == null) return;
+    el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return el;
+}
+
+function renderCheckbox(id, label, extra) {
+  const dateKey = getDateKey();
+  const key = dateKey + ':' + id;
+  const checked = checks[key] || false;
+  const wrapper = h('label', { className: `flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all ${checked ? 'bg-emerald-500/5' : 'hover:bg-white/[.02]'}` });
+  const cb = h('input', { type:'checkbox', className:'mt-1 rounded border-gray-600 bg-surface-900 text-brand-500 focus:ring-brand-500/50 cursor-pointer flex-shrink-0' });
+  cb.checked = checked;
+  cb.addEventListener('change', () => {
+    checks[key] = cb.checked;
+    saveChecks(checks);
+    textEl.className = cb.checked ? 'flex-1 check-done' : 'flex-1';
+  });
+  const textEl = h('div', { className: checked ? 'flex-1 check-done' : 'flex-1' });
+  textEl.appendChild(h('div', { className:'text-sm font-semibold text-gray-200' }, label));
+  if (extra) textEl.appendChild(extra);
+  wrapper.appendChild(cb);
+  wrapper.appendChild(textEl);
+  return wrapper;
+}
+
+function renderDrillItem(drill) {
+  const extra = h('div', { className:'mt-1 space-y-1' });
+  if (drill.reps) extra.appendChild(h('div', { className:'text-xs text-gray-500' }, drill.reps));
+  if (drill.time) extra.appendChild(h('div', { className:'text-xs text-gray-500' }, drill.time));
+  if (drill.desc) extra.appendChild(h('div', { className:'text-xs text-gray-400 mt-1' }, drill.desc));
+  if (drill.video) {
+    const link = h('a', { href:drill.video, target:'_blank', rel:'noopener', className:'video-link mt-1' });
+    link.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> ${drill.videoLabel || 'Watch Video'}`;
+    extra.appendChild(link);
+  }
+  if (drill.solo === true && !soloMode) {
+    extra.appendChild(h('span', { className:'solo-badge mt-1 inline-block' }, 'CAN DO SOLO'));
+  }
+  return renderCheckbox(drill.id, drill.name, extra);
+}
+
+// ═══════════════════════════════════════════
+// PAGES
+// ═══════════════════════════════════════════
+
+function renderSchedule() {
+  const page = h('div', { className:'space-y-4 fade-in' });
+  page.appendChild(h('div', null,
+    h('h1', { className:'text-2xl font-black text-white' }, 'Weekly Schedule'),
+    h('p', { className:'text-gray-500 text-sm mt-1' }, 'Summer 2026 | U11 Pre Academy | WakeFC')
+  ));
+
+  // Touch tracker link
+  const touchCard = h('a', { href:'https://jpmciver-hub.github.io/touch-tracker/', target:'_blank', className:'glass block p-4 hover:border-brand-500/30 transition-all' });
+  touchCard.innerHTML = `<div class="flex items-center justify-between"><div><div class="text-xs font-bold text-brand-400 uppercase tracking-wider">Touch Tracker App</div><div class="text-sm text-gray-400 mt-1">Log your daily touches and track your streak</div></div><div class="text-2xl">📊</div></div>`;
+  page.appendChild(touchCard);
+
+  // Schedule grid
+  const grid = h('div', { className:'space-y-2' });
+  const today = new Date().toLocaleDateString('en-US',{weekday:'long'});
+  WEEKLY_SCHEDULE.forEach(s => {
+    const isToday = s.day === today;
+    const card = h('div', { className:`glass p-4 ${isToday ? 'ring-1 ring-brand-500/40' : ''} ${s.key ? 'cursor-pointer hover:border-brand-500/20' : ''} transition-all` });
+    if (s.key) card.addEventListener('click', () => { currentDrill = s.key; currentTab = 'drill'; render(); });
+    const inner = h('div', { className:'flex items-center justify-between' });
+    const left = h('div', { className:'flex items-center gap-3' });
+    left.appendChild(h('div', { className:'text-2xl' }, s.icon));
+    const text = h('div');
+    const dayLine = h('div', { className:'flex items-center gap-2' });
+    dayLine.appendChild(h('span', { className:'text-sm font-bold text-white' }, s.day));
+    if (isToday) dayLine.appendChild(h('span', { className:'text-[10px] font-bold bg-brand-600 text-white px-2 py-0.5 rounded-full' }, 'TODAY'));
+    if (s.solo) dayLine.appendChild(h('span', { className:'solo-badge' }, 'SOLO OK'));
+    text.appendChild(dayLine);
+    text.appendChild(h('div', { className:'text-xs text-gray-400' }, s.session));
+    left.appendChild(text);
+    inner.appendChild(left);
+    if (s.key) inner.appendChild(h('div', { className:'text-gray-600', innerHTML:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>' }));
+    card.appendChild(inner);
+    grid.appendChild(card);
+  });
+  page.appendChild(grid);
+
+  return page;
+}
+
+function renderDrillPage(key) {
+  const data = DRILLS[key];
+  const page = h('div', { className:'space-y-4 fade-in' });
+
+  // Header with back button
+  const header = h('div', { className:'flex items-center gap-3' });
+  const back = h('button', { className:'p-2 rounded-xl hover:bg-white/10 transition-colors text-gray-400', onClick: () => { currentTab = soloMode ? 'solo' : 'schedule'; render(); } });
+  back.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>';
+  header.appendChild(back);
+  header.appendChild(h('div', null,
+    h('h1', { className:'text-xl font-black text-white' }, `${data.icon} ${data.title}`),
+    h('p', { className:'text-gray-500 text-xs' }, `${data.day} | ${data.duration}`)
+  ));
+  page.appendChild(header);
+
+  // Principles (defending)
+  if (data.principles) {
+    const princ = h('div', { className:'glass p-4' });
+    princ.appendChild(h('div', { className:'text-xs font-bold text-brand-400 uppercase tracking-wider mb-2' }, 'Key Principles'));
+    const ol = h('ol', { className:'space-y-1 list-decimal list-inside' });
+    data.principles.forEach(p => ol.appendChild(h('li', { className:'text-sm text-gray-300' }, p)));
+    princ.appendChild(ol);
+    page.appendChild(princ);
+  }
+
+  // Warm-up
+  if (data.warmup.length) {
+    const sec = h('div', { className:'glass p-4' });
+    sec.appendChild(h('div', { className:'text-xs font-bold text-amber-400 uppercase tracking-wider mb-2' }, 'Warm-Up'));
+    data.warmup.forEach(d => { if (!soloMode || d.solo) sec.appendChild(renderDrillItem(d)); });
+    page.appendChild(sec);
+  }
+
+  // Blocks
+  data.blocks.forEach(block => {
+    const drillsToShow = soloMode ? block.drills.filter(d => d.solo) : block.drills;
+    if (drillsToShow.length === 0) return;
+    const sec = h('div', { className:'glass p-4' });
+    const hdr = h('div', { className:'flex items-center justify-between mb-2' });
+    hdr.appendChild(h('div', { className:'text-xs font-bold text-brand-400 uppercase tracking-wider' }, block.title));
+    if (block.time) hdr.appendChild(h('div', { className:'text-xs text-gray-600' }, block.time));
+    sec.appendChild(hdr);
+    if (block.note) sec.appendChild(h('p', { className:'text-xs text-gray-500 mb-2 italic' }, block.note));
+    drillsToShow.forEach(d => sec.appendChild(renderDrillItem(d)));
+    page.appendChild(sec);
+  });
+
+  // Cool-down
+  if (data.cooldown && data.cooldown.length) {
+    const sec = h('div', { className:'glass p-4' });
+    sec.appendChild(h('div', { className:'text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2' }, 'Cool-Down'));
+    data.cooldown.forEach(d => { if (!soloMode || d.solo) sec.appendChild(renderDrillItem(d)); });
+    page.appendChild(sec);
+  }
+
+  if (data.touchCount) {
+    const tc = h('div', { className:'glass p-3 text-center' });
+    tc.innerHTML = `<span class="text-xs text-gray-500">Estimated touches: </span><span class="text-sm font-bold text-brand-400">${data.touchCount}</span>`;
+    page.appendChild(tc);
+  }
+
+  return page;
+}
+
+function renderSoloPage() {
+  const page = h('div', { className:'space-y-4 fade-in' });
+
+  const header = h('div');
+  header.appendChild(h('h1', { className:'text-2xl font-black text-white' }, 'Solo Training'));
+  header.appendChild(h('p', { className:'text-gray-500 text-sm mt-1' }, 'Sessions you can do by yourself — no partner needed'));
+  page.appendChild(header);
+
+  // Motivational card
+  const mCard = h('div', { className:'glass p-5 bg-gradient-to-br from-emerald-900/20 to-surface-800/60' });
+  mCard.innerHTML = `
+    <div class="text-lg font-black text-white mb-2">Hey! 👋</div>
+    <div class="text-sm text-gray-300 space-y-2">
+      <p>These sessions are designed for you to do <strong>on your own</strong>. No coach or parent needed.</p>
+      <p>Pick a session below, check off each drill as you complete it, and try to do them with <strong>good form</strong> before going fast.</p>
+      <p class="text-emerald-400 font-semibold">Remember: the best players in the world got there by training on their own every day. This is your time.</p>
+    </div>
+  `;
+  page.appendChild(mCard);
+
+  // Quick-pick solo sessions
+  SOLO_SESSIONS.forEach(session => {
+    const card = h('details', { className:'glass overflow-hidden' });
+    const summary = h('summary', { className:'p-4 flex items-center justify-between hover:bg-white/[.02] transition-colors' });
+    const left = h('div', { className:'flex items-center gap-3' });
+    left.appendChild(h('div', { className:'w-10 h-10 rounded-xl bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-lg font-black' }, session.time.split(' ')[0]));
+    const text = h('div');
+    text.appendChild(h('div', { className:'text-sm font-bold text-white' }, session.title));
+    text.appendChild(h('div', { className:'text-xs text-gray-500' }, `${session.time} — ${session.desc}`));
+    left.appendChild(text);
+    summary.appendChild(left);
+    summary.appendChild(h('div', { className:'arrow text-gray-600 transition-transform', innerHTML:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>' }));
+    card.appendChild(summary);
+    const content = h('div', { className:'px-4 pb-4 border-t border-white/5 pt-2' });
+    session.drills.forEach(d => content.appendChild(renderDrillItem(d)));
+    card.appendChild(content);
+    page.appendChild(card);
+  });
+
+  // Link to full drill days that are solo-friendly
+  const fullDays = h('div', { className:'glass p-4' });
+  fullDays.appendChild(h('div', { className:'text-xs font-bold text-brand-400 uppercase tracking-wider mb-3' }, 'Full Solo-Friendly Training Days'));
+  fullDays.appendChild(h('p', { className:'text-xs text-gray-500 mb-3' }, 'These full sessions from the weekly plan can be done mostly solo:'));
+  ['footwork','speed','strength'].forEach(key => {
+    const data = DRILLS[key];
+    const btn = h('button', { className:'w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/[.02] transition-all text-left', onClick: () => { soloMode = true; currentDrill = key; currentTab = 'drill'; render(); } });
+    btn.appendChild(h('div', { className:'flex items-center gap-2' },
+      h('span', { className:'text-lg' }, data.icon),
+      h('span', { className:'text-sm font-semibold text-white' }, data.title),
+      h('span', { className:'solo-badge' }, '100% SOLO'),
+    ));
+    btn.appendChild(h('div', { className:'text-gray-600', innerHTML:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>' }));
+    fullDays.appendChild(btn);
+  });
+  page.appendChild(fullDays);
+
+  return page;
+}
+
+function renderProgressPage() {
+  const page = h('div', { className:'space-y-4 fade-in' });
+  page.appendChild(h('div', null,
+    h('h1', { className:'text-2xl font-black text-white' }, 'Progress'),
+    h('p', { className:'text-gray-500 text-sm mt-1' }, 'Track your daily checklist completion')
+  ));
+
+  // Today's stats
+  const dateKey = getDateKey();
+  const allDrillIds = [];
+  Object.values(DRILLS).forEach(d => {
+    d.warmup.forEach(x => allDrillIds.push(x.id));
+    d.blocks.forEach(b => b.drills.forEach(x => allDrillIds.push(x.id)));
+    if (d.cooldown) d.cooldown.forEach(x => allDrillIds.push(x.id));
+  });
+  SOLO_SESSIONS.forEach(s => s.drills.forEach(x => allDrillIds.push(x.id)));
+
+  const todayDone = allDrillIds.filter(id => checks[dateKey + ':' + id]).length;
+
+  const statCard = h('div', { className:'glass p-6 text-center' });
+  statCard.appendChild(h('div', { className:'text-5xl font-black text-brand-400' }, String(todayDone)));
+  statCard.appendChild(h('div', { className:'text-sm text-gray-500 mt-1' }, 'drills completed today'));
+  page.appendChild(statCard);
+
+  // Last 7 days
+  const weekCard = h('div', { className:'glass p-4' });
+  weekCard.appendChild(h('div', { className:'text-xs font-bold text-gray-400 uppercase tracking-wider mb-3' }, 'Last 7 Days'));
+  const grid = h('div', { className:'grid grid-cols-7 gap-2' });
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dk = d.toISOString().split('T')[0];
+    const count = allDrillIds.filter(id => checks[dk + ':' + id]).length;
+    const dayName = d.toLocaleDateString('en-US',{weekday:'short'});
+    const col = h('div', { className:'text-center' });
+    col.appendChild(h('div', { className:'text-[10px] text-gray-600' }, dayName));
+    const circle = h('div', { className:`w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-1 text-sm font-bold ${count > 0 ? 'bg-brand-600/30 text-brand-400' : 'bg-white/5 text-gray-600'}` }, String(count));
+    col.appendChild(circle);
+    grid.appendChild(col);
+  }
+  weekCard.appendChild(grid);
+  page.appendChild(weekCard);
+
+  // Reset today
+  const resetBtn = h('button', { className:'w-full p-3 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-400 text-sm font-semibold transition-all', onClick: () => {
+    if (confirm('Reset all of today\'s checkmarks?')) {
+      Object.keys(checks).forEach(k => { if (k.startsWith(dateKey)) delete checks[k]; });
+      saveChecks(checks);
+      render();
+    }
+  } }, 'Reset Today\'s Checkmarks');
+  page.appendChild(resetBtn);
+
+  return page;
+}
+
+function renderResourcesPage() {
+  const page = h('div', { className:'space-y-4 fade-in' });
+  page.appendChild(h('div', null,
+    h('h1', { className:'text-2xl font-black text-white' }, 'Resources'),
+    h('p', { className:'text-gray-500 text-sm mt-1' }, 'Video tutorials and local programs')
+  ));
+
+  // Videos section
+  const videos = [
+    { title:"Ball Mastery & Toe Taps (U8-U12)", url:"https://www.youtube.com/watch?v=KaktBhbJUyg", cat:"Footwork" },
+    { title:"5 Essential Footwork Drills for Kids", url:"https://www.youtube.com/watch?v=tBV9Ul1a7Pw", cat:"Footwork" },
+    { title:"Cruyff Turn Step-by-Step", url:"https://www.youtube.com/watch?v=JHeFB7B7WYQ", cat:"Moves" },
+    { title:"Shooting Technique (Laces)", url:"https://www.youtube.com/watch?v=ibYthQWrN4g", cat:"Shooting" },
+    { title:"Laces Power & Accuracy Guide", url:"https://www.youtube.com/watch?v=Q08yheXF4OQ", cat:"Shooting" },
+    { title:"Shooting Tutorial for Parents", url:"https://www.youtube.com/watch?v=cvwOsHbFaoc", cat:"Shooting" },
+    { title:"How to Defend (US Youth Soccer)", url:"https://www.youtube.com/watch?v=XsHs4dW4pNY", cat:"Defending" },
+    { title:"1v1 Defending Drills", url:"https://www.youtube.com/watch?v=ceMFekk-xdE", cat:"Defending" },
+    { title:"Juggling Progression Guide", url:"https://www.risefcsoccer.com/youth-soccer-juggling-drills/", cat:"Ball Control" },
+    { title:"Agility Ladder Drills (All Ages)", url:"https://www.gftskills.com/agility-ladder-drills-for-soccer-all-ages/", cat:"Speed" },
+    { title:"Speed & Agility Drills for Kids", url:"https://barcelonapremiersc.com/soccer-club/soccer-speed-and-agility-drills-for-kids/", cat:"Speed" },
+    { title:"Soccer Ladder Drills Guide", url:"https://www.risefcsoccer.com/soccer-ladder-drills/", cat:"Speed" },
+  ];
+
+  const vidCard = h('div', { className:'glass p-4' });
+  vidCard.appendChild(h('div', { className:'text-xs font-bold text-brand-400 uppercase tracking-wider mb-3' }, 'Video Tutorials & Guides'));
+  let lastCat = '';
+  videos.forEach(v => {
+    if (v.cat !== lastCat) {
+      vidCard.appendChild(h('div', { className:'text-xs font-semibold text-gray-500 uppercase tracking-wider mt-4 mb-2 first:mt-0' }, v.cat));
+      lastCat = v.cat;
+    }
+    const link = h('a', { href:v.url, target:'_blank', rel:'noopener', className:'flex items-center gap-3 p-2 rounded-lg hover:bg-white/[.03] transition-colors' });
+    link.innerHTML = `<div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><span class="text-sm text-gray-300">${v.title}</span>`;
+    vidCard.appendChild(link);
+  });
+  page.appendChild(vidCard);
+
+  // Local programs
+  const programs = [
+    { name:"WakeFC Pre-Academy Clinic", desc:"Position-specific training for pre-academy players", url:"https://www.wakefc.com/Default.aspx?tabid=1458721", loc:"Cary / Holly Springs", price:"~$100-150" },
+    { name:"WakeFC Summer Camps", desc:"Skill Accelerator, Pre-Academy Camp, Finishing", url:"https://www.wakefc.com/Default.aspx?tabid=1458708", loc:"WakeMed / Middle Creek", price:"Varies" },
+    { name:"Soccer Genome (Private Training)", desc:"Elite 1-on-1 training, game-realistic methodology", url:"https://www.soccergenome.com/private-train", loc:"NE Raleigh", price:"~$60-80/session" },
+    { name:"Athletic Republic Cary", desc:"Soccer-specific speed & agility training", url:"https://cary.athleticrepublic.com/sports-performance-training-cary-nc/soccer-training/", loc:"607 Mills Park Dr, Cary", price:"Free trial available" },
+    { name:"Parisi Speed School", desc:"Speed & agility fundamentals for youth", url:"https://parisiraleigh.com/", loc:"Apex (near Cary)", price:"Contact" },
+    { name:"SportHQ", desc:"Performance training & strength", url:"https://sporthq.org/", loc:"107 Edinburgh South Dr, Cary", price:"Contact" },
+  ];
+
+  const progCard = h('div', { className:'glass p-4' });
+  progCard.appendChild(h('div', { className:'text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3' }, 'Local Programs (Cary, NC)'));
+  programs.forEach(p => {
+    const item = h('a', { href:p.url, target:'_blank', rel:'noopener', className:'block p-3 rounded-xl hover:bg-white/[.03] transition-colors border-b border-white/[.03] last:border-0' });
+    item.innerHTML = `<div class="flex items-center justify-between"><div><div class="text-sm font-semibold text-white">${p.name}</div><div class="text-xs text-gray-500 mt-0.5">${p.desc}</div><div class="text-xs text-gray-600 mt-1">📍 ${p.loc} · ${p.price}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" class="flex-shrink-0"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>`;
+    progCard.appendChild(item);
+  });
+  page.appendChild(progCard);
+
+  return page;
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION & MAIN RENDER
+// ═══════════════════════════════════════════
+
+const TABS = [
+  { id:'schedule', label:'Schedule', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' },
+  { id:'solo', label:'Solo', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' },
+  { id:'progress', label:'Progress', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>' },
+  { id:'resources', label:'Links', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>' },
+];
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  // Main content
+  const main = h('div', { className:'max-w-lg mx-auto px-4 pt-4 pb-24 md:pb-8' });
+
+  if (currentTab === 'drill' && currentDrill) {
+    main.appendChild(renderDrillPage(currentDrill));
+  } else if (currentTab === 'solo') {
+    soloMode = false;
+    main.appendChild(renderSoloPage());
+  } else if (currentTab === 'progress') {
+    main.appendChild(renderProgressPage());
+  } else if (currentTab === 'resources') {
+    main.appendChild(renderResourcesPage());
+  } else {
+    soloMode = false;
+    main.appendChild(renderSchedule());
+  }
+  app.appendChild(main);
+
+  // Bottom nav
+  const nav = h('nav', { className:'fixed bottom-0 left-0 right-0 bg-surface-850/95 backdrop-blur-xl border-t border-white/5 z-40' });
+  const navInner = h('div', { className:'max-w-lg mx-auto flex items-center justify-around py-2 px-2' });
+  TABS.forEach(tab => {
+    const isActive = (currentTab === tab.id) || (currentTab === 'drill' && tab.id === (soloMode ? 'solo' : 'schedule'));
+    const btn = h('button', { className:`flex flex-col items-center gap-0.5 p-2 rounded-xl transition-all ${isActive ? 'tab-active' : 'text-gray-500'}`, onClick: () => {
+      currentTab = tab.id;
+      currentDrill = null;
+      soloMode = false;
+      render();
+    }});
+    btn.innerHTML = `<div>${tab.icon}</div><span class="text-[10px] font-medium">${tab.label}</span>`;
+    navInner.appendChild(btn);
+  });
+  nav.appendChild(navInner);
+  app.appendChild(nav);
+
+  window.scrollTo(0,0);
+}
+
+render();
+</script>
+</body>
+</html>
